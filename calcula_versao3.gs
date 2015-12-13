@@ -341,12 +341,14 @@ endif
 *
 *
 *
-if  ( label = "JUFURN"  & ( mes >=1 & mes <=3 )  | mes =12   ) 
+if  ( label = "JUFURN"  & ( mes <=3   | mes =12)   ) 
+pp=1
 if (ptoteta10> 179.5 )
 chuvasem=179.5
 else
 chuvasem=ptoteta10
 endif
+
 while (pp<=10)
 'set t ' pp
 'q time'
@@ -743,7 +745,7 @@ endif
 *
 * AGO/NOV: a=0,0006; b=0,65847 e limite 10 dias= 63,1 mm
 *              
-if  ( label = "MON3MA"  & ( mes >=8  &  mes <=11 )  ) 
+if  ( label = "3MARIAS"  & ( mes >=8  &  mes <=11 )  ) 
 *
 * constantes a e b 
 *
@@ -793,7 +795,7 @@ endif
 * DEZ/JAN: a=0,00008; b=0,76973 e limite 10 dias= 133,7 mm
 *Montante Emborcação
 *
-if  ( label = "JUEMBO"  & ( mes =12  |  mes =1 )  ) 
+if  ( label = "3MARIAS"  & ( mes =12  |  mes =1 )  ) 
 *
 * constantes a e b 
 *
@@ -844,7 +846,7 @@ endif
 * 
 *Montante Emborcação
 *
-if  ( label = "JUEMBO"  & ( mes >=2  &  mes <=3 )  ) 
+if  ( label = "3MARIAS"  & ( mes >=2  &  mes <=3 )  ) 
 *
 * constantes a e b 
 *
