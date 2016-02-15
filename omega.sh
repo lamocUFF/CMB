@@ -24,6 +24,9 @@
 #--------------------------------------------------------------------------
 
 
+MODDEBUG=1 
+
+
 #
 # Existem duas rodadas do modelo ao dia. Uma as 00Z e outra as 12Z
 # se nada for informada na linha de comando assume-se 00z
@@ -31,14 +34,24 @@
 #
 export LANG=en_us_8859_1
 
-
 #
-# executando os processos 
+# verifica sistema
+# no cygwin (windows) 
+# se bem instalado deve
+# funcionar sem as variaveis
 #
 
-./adquire_eta40.sh $1
-./adquire_obs.sh $1
-./adquire_gfs.sh  $1
 
+MACH=`uname -a | cut -c1-5` 
+if [ $MACH = "Linux" ];then 
+export PATH=$PATH:/usr/local/grads
+export GADDIR=/usr/local/grads
+export GADLIB=/usr/local/grads
+export GASCRP=/usr/local/grads
+fi 
 
+ 
+./adquire_eta40.sh 
+./adquire_obs.sh
+./adquire_gfs.sh
 

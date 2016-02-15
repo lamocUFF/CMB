@@ -1,10 +1,100 @@
-#/bin/sh
+#/bin/bash 
+#------------------------------------------------------------------------
 #
-# entra no diretorio de trabalho 
+#
+#  SCRIPT PARA ADQUIRIR PREVISOES DO ETA 10 DIAS DO CPTEC E 
+#  CALCULAR CHUVA ACUMULADA POR BACIA DO SIN 
+#
+#  VERSAO 2.0 
 #
 #
-# força a libguagem ser inglês
+#  bY regis  reginaldo.venturadesa@gmail.com 
+#  uso:
+#      adquire  [00/12]
+#    
+# ----------------------------------------------------------------------
+# Necessita de um arquivo contendo informaçoes sonre as bacias. 
+#  (ver como documentar isso aqui)
 #
+#
+#
+#------------------------------------------------------------------------- 
+# essa versao é feita pela conta regisgrundig e nao pela lAMOC
+#
+#--------------------------------------------------------------------------
+
+
+MODDEBUG=1 
+
+
+#
+# Existem duas rodadas do modelo ao dia. Uma as 00Z e outra as 12Z
+# se nada for informada na linha de comando assume-se 00z
+#
+#
+export LANG=en_us_8859_1
+
+#
+# verifica sistema
+# no cygwin (windows) 
+# se bem instalado deve
+# funcionar sem as variaveis
+#
+
+
+MACH=`uname -a | cut -c1-5` 
+if [ $MACH = "Linux" ];then 
+export PATH=$PATH:/usr/local/grads
+export GADDIR=/usr/local/grads
+export GADLIB=/usr/local/grads
+export GASCRP=/usr/local/grads
+fi 
+
+ 
+
+
+#
+# Pega data do dia (relogio do micro)
+# DATA0 = data de hoje
+# DATA1 = data de amanha (para os produtos)
+# DATA2 = data de 7 dias a frente 
+# 
+
+if [ $1 ="" ];then
+data=`date +"%Y%m%d"`
+data_rodada=`date +"%d/%m/%Y"`
+grads_data=`date -d "34 days ago" +"12Z%d%b%Y"`
+else
+let b="$1-1"
+let c="$34+$1"
+data=`date +"%Y%m%d" -d "$1 days ago"`
+data_rodada=`date +"%d/%m/%Y" -d "$1  days ago"`
+grads_data=`date -d "$c days ago" +"12Z%d%b%Y"`
+fi
+
+#
+# data da rodada para referencia
+#  e data para o grads
+#
+
+
+
+
+echo $data
+echo $datagrads
+
+
+
+
+hora="00"
+
+
+
+echo "["`date`"] ADQUIRINDO DADOS OBSERVADOS" 
+
+
+
+
 export LANG=en_us_8859_1
 
 #
@@ -21,54 +111,68 @@ export GADLIB=/usr/local/grads
 export GASCRP=/usr/local/grads
 fi 
 
-mkdir GFS   >./LOG.prn 2>&1 
-cd GFS       >>./LOG.prn 2>&1 
+
 #
-# configurador de dados quando se deseja rodar para o passado
+# entra no diretorio de trabalho 
 #
-if [ $1 ="" ];then
-dir_data=`date +"%Y%m%d"`
-grads_data=`date +"00Z%d%b%Y"`
-grads_data2=`date +"00Z%d%b%Y" -d "1  days "`
-data_rodada=`date +"%d/%m/%Y"`
-else
-let b="$1-1"
-let c="$34+$1"
-dir_data=`date +"%Y%m%d" -d "$1 days ago"`
-grads_data=`date +"00Z%d%b%Y" -d "$b  days ago"`
-grads_data2=`date +"00Z%d%b%Y" -d "$b  days ago"`
-data_rodada=`date +"%d/%m/%Y" -d "$c  days ago"`
-fi
+if [ ! -f ./CHUVA_DE_GRADE ];then 
+mkdir ./CHUVA_DE_GRADE            >./LOG.prn 2>&1 
+fi  
 #
-# cria diretorio de produção
-# e copia o script  calculador 
+# entra no direotiro CHUVA_DE_GRADE e depois diretorio da data do dia
+# onde tudo aocntece. 
 #
-mkdir $dir_data  >>./LOG.prn 2>&1
-cd $dir_data   >>./LOG.prn 2>&1
-cp ../../calcula_gfs_1P0.gs .
-echo "["`date`"] ADQUIRINDO DADOS GFS  E GERANDO MEDIA POR BACIA" 
+cd CHUVA_DE_GRADE
+
 #
-#  configurador de data para o grads
+# SE NAO EXISTE CRIA DIRETORIO DADOS
+# DIRETORIO DADOS CONTEM OS DADOS DE CHUVA
+# ELE É ATUALZIADO TODA A RODADA
 #
-echo $dir_data >gfs.config   
+if [ ! -f ./DADOS ];then 
+mkdir ./DADOS            >>./LOG.prn 2>&1 
+fi  
+cd DADOS
 #
-# cria o .ctl 
+# baixa as 63 ultimas chuvas. se jรก baixou passa adiante. 
 #
-echo "dset  "$dir_data"_1P0.bin" > gfs_1P0.ctl
-echo "title GFS 1.0 deg starting from 00Z08jul2015, downloaded Jul 08 04:44 UTC" >>gfs_1P0.ctl
-echo "undef 9.999e+20" >>gfs_1P0.ctl
-echo "xdef 51 linear -80 1.00" >>gfs_1P0.ctl
-echo "ydef 51 linear -40 1.00" >>gfs_1P0.ctl
-echo "zdef 1 levels 1000">>gfs_1P0.ctl
-echo "tdef 33 linear "$grads_data2" 12hr" >>gfs_1P0.ctl 
-echo "vars 1">>gfs_1P0.ctl
-echo "chuva  0  t,y,x  ** chuva mm">>gfs_1P0.ctl
-echo "endvars">>gfs_1P0.ctl
+for n in `seq --format=%02g 0 33`
+do
+download_data=`date +"%Y%m%d" -d "$n days ago"`
+ano=`date +"%Y" -d "$n days ago"`
+wget -nc ftp1.cptec.inpe.br/modelos/io/produtos/MERGE/$ano/prec_$download_data".bin" >>./LOG.prn 2>&1
+done
+cd ..
 #
-# executa o script calculador 
+# CRIA DIRETORIO DE PRODUCAO 
 #
-grads -lbc "calcula_gfs_1P0.gs"  >>./LOG.prn 2>&1
-echo "["`date`"] GERANDO FIGURAS POR BACIA" 
+#rm -r $data  >>./LOG.prn 2>&1 
+mkdir $data >>./LOG.prn 2>&1 
+cd $data     >>./LOG.prn 2>&1 
+#
+#  copia o script calculador para diretorio de producao 
+#
+cp ../../calcula_chuva_merge.gs .
+#
+# cria o arquivo ctl 
+#
+echo "dset ^../DADOS/prec_%y4%m2%d2.bin" >chuvamerge.ctl
+echo "options  little_endian template"                        >>chuvamerge.ctl
+echo "title global daily analysis "                           >>chuvamerge.ctl
+echo "undef -999.0 "                                          >>chuvamerge.ctl 
+echo "xdef 245 linear    -82.8000 0.2000"                           >>chuvamerge.ctl
+echo "ydef 313 linear -50.2000  0.2000 "                          >>chuvamerge.ctl
+echo "zdef 1    linear 1 1 "                                  >>chuvamerge.ctl
+echo "tdef 34 linear $grads_data 1dy "                         >>chuvamerge.ctl
+echo "vars 2"                                                 >>chuvamerge.ctl
+echo "rain     1  00 the grid analysis (0.1mm/day)"           >>chuvamerge.ctl
+echo "gnum     1  00 the number of stn"                       >>chuvamerge.ctl
+echo "ENDVARS"                                                >>chuvamerge.ctl
+echo "["`date`"] CALCULANDO CHUVA  OBSERVADA"  >./LOG.prn 2>&1 
+#
+# executa o calculador
+#
+grads -lbc "calcula_chuva_merge.gs"  >>./LOG.prn 2>&1 
 #------------------------------------------------------------------------------
 #              AUTO SCRIPT PARA CRIAÇÃO DE FIGURAS
 #-----------------------------------------------------------------------------------------
@@ -79,7 +183,7 @@ echo "["`date`"] GERANDO FIGURAS POR BACIA"
 echo "*"                                                                 >figura3.gs
 echo "* esse script é auto gerado. documentação em adquire_eta.sh"      >>figura3.gs
 echo "*By reginaldo.venturadesa@gmail.com "                             >>figura3.gs
-echo "'open gfs_1P0.ctl'"            >>figura3.gs
+echo "'open chuvamerge.ctl'"            >>figura3.gs
 #echo "*'set mpdset hires'"               >>figura3.gs
 echo "'set gxout shaded'"               >>figura3.gs
 #
@@ -120,7 +224,7 @@ echo "'set lat 'y1' 'y0 "       >>figura3.gs
 # caso a bacia se ja em forma de retrato 
 # definido no arquivo limites_das_bacias em CONTORNOS/CADASTRADAS
 #
-#   FIGURAS RETRATO 
+#   FIGURAS RETRATO SEMANA OPERATIVA 1
 # 
 echo "if (tipo = "RETRATO" & page ="8.5" & plota="SIM") "   >>figura3.gs
 echo "t=1 "    >>figura3.gs 
@@ -134,11 +238,11 @@ echo "dia1=substr(var1,4,2)"                       >>figura3.gs
 echo "'c'"                        >>figura3.gs
 echo "'set parea 0.5 8.5 1.5 10.2'"                                  >>figura3.gs
 echo "'coresdiaria.gs'"                    >>figura3.gs
-echo "'d sum(chuva,t='t',t='t+1')'"            >>figura3.gs
+echo "'d rain'"            >>figura3.gs
 echo "'cbarn.gs'"                       >>figura3.gs
-echo "'draw string 2.5 10.8     PRECIPITACAO ACUMULADA DIARIA GFS '"  >>figura3.gs
-echo "'draw string 2.5 10.6 RODADA :"$data_rodada"'"               >>figura3.gs
-echo "'draw string 2.5 10.4 DIA    :'dia1'/'mes1'/'ano1  "                     >>figura3.gs
+echo "'draw string 2.5 10.8     PRECIPITACAO ACUMULADA DIARIA'"  >>figura3.gs
+echo "'draw string 2.5 10.6     DATA GERACAO DA IMAGEM :"$data_rodada"'"               >>figura3.gs
+echo "'draw string 2.5 10.4     DIA    :'dia1'/'mes1'/'ano1  "                     >>figura3.gs
 echo "'set rgb 50   255   255    255'" 								>>figura3.gs
 echo "'basemap.gs O 50 0 M'" 										>>figura3.gs
 echo "'set mpdset hires'" 											>>figura3.gs
@@ -153,7 +257,7 @@ echo "'cbarn.gs'" >>figura3.gs
 echo "'plota_hidrografia.gs'"     >>figura3.gs  
 echo "plotausina(bacia,page)" >>figura3.gs    
 echo "'printim 'bacia'_diario_'var1'.png white'"                       >>figura3.gs
-echo "t=t+2"                    >>figura3.gs
+echo "t=t+1"                    >>figura3.gs
 echo "c"                    >>figura3.gs
 echo "endwhile"                    >>figura3.gs
 echo "endif" 					>>figura3.gs
@@ -162,7 +266,7 @@ echo "endif" 					>>figura3.gs
 # definido no arquivo limites_das_bacias em CONTORNOS/CADASTRADAS
 #
 #
-#  FIGURA PAISAGEM 
+#  FIGURA PAISAGEM  SEMANA OPERATIVA 1
 #
 echo "if (tipo = "PAISAGEM" & page ="11" & plota="SIM" ) "   >>figura3.gs
 echo "t=1 "    >>figura3.gs 
@@ -177,10 +281,11 @@ echo "'c'"                        >>figura3.gs
 echo "'c'"                        >>figura3.gs
 echo "'set parea 0.5 10.5 1.88392 7.31608'"                     >>figura3.gs
 echo "'coresdiaria.gs'"                    >>figura3.gs
-echo "'d sum(chuva,t='t',t='t+1')'"         >>figura3.gs
+echo "'d rain'"         >>figura3.gs
 echo "'cbarn.gs'"                       >>figura3.gs
-echo "'draw string 2.5 8.3  PRECIPITACAO ACUMULADA DIARIA GFS'"  >>figura3.gs
-echo "'draw string 2.5 8.1 RODADA :"$data_rodada"'"               >>figura3.gs
+echo "'draw string 2.5 8.3 PRECIPITACAO ACUMULADA SEMANA OPERATIVA 1'"  >>figura3.gs
+#echo "'draw string 2.5 8.1 RODADA :"$data_rodada"'"               >>figura3.gs
+echo "'draw string 2.5 8.1 DATA GERAÇÂO IMAGEM :"$data_rodada"'"               >>figura3.gs
 echo "'draw string 2.5 7.9 DIA    :'dia1'/'mes1'/'ano1  "                     >>figura3.gs
 echo "'set rgb 50   255   255    255'" >>figura3.gs
 echo "'basemap.gs O 50 0 M'" >>figura3.gs
@@ -193,7 +298,7 @@ echo "'plota_hidrografia.gs'"     >>figura3.gs
 echo "plotausina(bacia,page)" >>figura3.gs  
 echo "'printim 'bacia'_diaria_'var1'.png white'"                       >>figura3.gs
 echo "'c'"                                                             >>figura3.gs
-echo "t=t+2"                    >>figura3.gs
+echo "t=t+1"                    >>figura3.gs
 echo "'c'"                    >>figura3.gs
 echo "endwhile"                    >>figura3.gs
 #
@@ -322,28 +427,20 @@ echo "'define_colors.gs'">>coresdiaria.gs
 echo "'set rgb 99 251 94 107'">>coresdiaria.gs
 echo "'set clevs    00 05 10 15 20 25 30 35  50  70  100  150'">>coresdiaria.gs
 echo "'set ccols 00 43 45 47 49 34 37 39 25  27  29   57   58 59'  ">>coresdiaria.gs
-echo "["`date`"] CRIANDO FIGURAS OBSERVADO"                                         >>plota_hidrografia.gs
-#------------------------------------------------------------------------------
-#  FIM DO AUTOSCRIPT DE CRIAÇÃO DE FIGURAS
-#------------------------------------------------------------------------------
-#
+echo "["`date`"] CRIANDO FIGURAS OBSERVADO" 
 #
 #  adiciona o scripts o script que plota bacias
 #
 cat  ../../UTIL/modulo_grads.mod  >> figura3.gs
 #
-#  EXECUTA O SCRIPT GERADO PELO AUTO SCRIPT PARA GERAÇÃO DE FIGURAS
+# executa script gerador de imagens
 #
-grads -lbc "figura3.gs"  >>./LOG.prn 2>&1
-grads -pbc "figura3.gs"  >>./LOG.prn 2>&1
-
+grads -pbc "figura3.gs"  >>./LOG.prn 2>&1 
+grads -lbc "figura3.gs"  >>./LOG.prn 2>&1 
 #
-# COPIA AS FIGURAS GERADAS PARA O DIRETORIA DIARIO
+#  copia imagens geradas para dirrtorio diario 
 #
 mkdir diaria >>./LOG.prn 2>&1
 mv *.png  diaria
-echo "["`date`"] FIM DO PROCESSO GFS" 
-
 cd ..
 cd ..
-

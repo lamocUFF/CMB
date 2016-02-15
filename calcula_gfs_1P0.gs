@@ -1,9 +1,4 @@
-*------------------------------------------------------------------------
-*
-*
-*  SCRIPT CALCULAR CHUVA NA BACIA USANDO CHUVA DE GRADE
-*  CALCULAR CHUVA ACUMULADA POR BACIA DO SIN 
-*
+
 *  VERSAO 2.0 
 *
 *
@@ -13,23 +8,24 @@
 *------------------------------------------------------------------------- 
 *
 *
-'reinit'
-'open chuvamerge.ctl'
-'q time'
-data=subwrd(result,3)
-'q files'
-ans=sublin(result,3)
-var=subwrd(ans,2)
-*
-* datas
-*
-'set t 1 last'
-'q time'
-data2=subwrd(result,3)
-data1=subwrd(result,5)
- 
-say data1' 'data2
+id=read('gfs.config')
+status=sublin(id,1)
+config=sublin(id,2)
+say config
+data=subwrd(config,1)
+say data
+fi=baixagfs(data)
+'close 1'
+pi=extrai(data)
 
+'quit'
+
+
+function  extrai(data)
+
+'open gfs_1P0.ctl'
+
+say '------------->'data
 *
 *  leio arquivo bacia e processo 
 * para cada item dentro desse arquivo
@@ -46,8 +42,7 @@ id=read("../../UTIL/limites_das_bacias.dat")
 status=sublin(id,1)   
 
 if (status>0) 
-say "deu ruim!"
-'quit'
+return
 endif
 var=sublin(id,2)
 opcao=subwrd(var,1)
@@ -70,29 +65,23 @@ status2=status
 chuva=0
 conta=0
 p=0 
+precip=0
 _pchuva.1=0
-while (t<=34)
-'set t ' t
+while (t<=31)
+'set t ' t+1
 'q time'
 dataprev=subwrd(result,3)
-*say dataprev' 'result
-
-
 *
 * tendo o nome da bacia lido no arquivo "bacia"
 * vou pegar os pontos d egrade que estao
 * dentro da bacia
 *
-
 fd=close("../../CONTORNOS/CADASTRADAS/"bacia)
 status2=0
-
 *
 * execuo esse esse bloco ate  a leitura
 * de todos os pontos de grade que estao na bacia
 *
-conta=0
-chuva=0
 while (!status2)
 fd=read("../../CONTORNOS/CADASTRADAS/"bacia)
 status2=sublin(fd,1)
@@ -107,31 +96,58 @@ xlat=subwrd(coord,2)
 'set lat 'xlat
 'set lon 'xlon
 *
-* pego a chuva do ponto de grade
+* pego a precip do ponto de grade
 *
-'d rain'
-valor=subwrd(result,4) 
-if valor > 0
-chuva=chuva+valor
+'d sum(chuva,t='t',t='t+1')'
+var=sublin(result,2)
+valor=subwrd(var,4)
+*say valor' 't
+*say result
+if (valor >=0 )
+precip=precip+valor
 conta=conta+1
-
-yyy=write("logao.prn",bacia' 'xlat' 'xlon' 'valor' 'conta' 't,append)
-
-
+yyy=write("logao.prn",bacia' 'xlat' 'xlon' 'valor' 'conta' 'precip' 't,append)
 endif 
+*ay result
 endif
 endwhile
-media=chuva/(conta+(0.00001))
-rc1 = math_format("%7.2f",chuva)
+
+
+
+media=precip/(conta+(0.00001))
+rc1 = math_format("%7.2f",precip)
 rc2 = math_format("%7.0f",conta)
 rc3 = math_format("%5.2f",media)
-fim=write(bacia,data1' 'dataprev' 'rc3)
-xxx=write("todomundo.prn",data1' 'dataprev' 'rc3,append)
-t=t+1
+fim=write(bacia,data' 'dataprev' 'rc3)
+xxx=write("todomundo.prn",data' 'dataprev' 'rc3,append)
+t=t+2
 endwhile
+
 ************  da linha 36
-endwhile     
+endwhile    
 'quit'
 
 
 
+
+
+
+
+function baixagfs(config)
+
+'sdfopen http://nomads.ncep.noaa.gov:9090/dods/gfs_1p00/gfs'config'/gfs_1p00_00z'
+
+'set lon 280 330'
+'set lat -40 10'
+t=2
+'set fwrite 'config'_1P0.bin'
+'set gxout fwrite'
+while (t<=33)
+'set t 't
+'d pratesfc*12*3600'
+*'d apcpsfc'
+t=t+1
+endwhile
+'disable fwrite'
+'set gxout shaded'
+return
