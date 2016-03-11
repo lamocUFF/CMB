@@ -4,7 +4,7 @@
 # 
 echo "'set line 15 1 1'"                                             >plota.gs
 echo "'draw shp ../../CONTORNOS/SHAPES/BRASIL.shp '"                 >>plota.gs
-echo "'set line 1 1 1'"                                              >>plota.gs
+echo "'set line 1 1 3'"                                              >>plota.gs
 for file in `ls -1 ../../CONTORNOS/SHAPES/contorno*.shp`
 do
 echo "'draw shp "$file"'"                                            >>plota.gs
@@ -14,7 +14,7 @@ done
 # 
 echo "'set line 15 1 1'"                                             >plota_hidrografia.gs
 echo "'draw shp ../../CONTORNOS/SHAPES/hidrografia.shp '"                 >>plota_hidrografia.gs
-echo "'set line 5 1 1'"                                             >>plota_hidrografia.gs
+echo "'set line 5 1 3'"                                             >>plota_hidrografia.gs
 #
 #  CRIA ESCALA DE CORES 
 #   (PARA HABILITAR , RETIRE O * DA FRENTE DA LINHA E COLOQUE * NA QUE 
@@ -85,3 +85,7 @@ echo "'define_colors.gs'">>coresdiaria.gs
 echo "'set rgb 99 251 94 107'">>coresdiaria.gs
 echo "'set clevs    05 10 15 20 25 30 35  50  70  100  150'">>coresdiaria.gs
 echo "'set ccols 00 44 45 47 49 34 37 39  22  23  27    29   99'  ">>coresdiaria.gs
+
+
+
+
