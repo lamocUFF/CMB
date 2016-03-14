@@ -1,20 +1,5 @@
 #/bin/bash 
-#*                                                     	
-#*██╗      █████╗ ███╗   ███╗ ██████╗  ██████╗    ██╗   ██╗███████╗███████╗
-#*██║     ██╔══██╗████╗ ████║██╔═══██╗██╔════╝    ██║   ██║██╔════╝██╔════╝
-#*██║     ███████║██╔████╔██║██║   ██║██║         ██║   ██║█████╗  █████╗  
-#*██║     ██╔══██║██║╚██╔╝██║██║   ██║██║         ██║   ██║██╔══╝  ██╔══╝  
-#*███████╗██║  ██║██║ ╚═╝ ██║╚██████╔╝╚██████╗    ╚██████╔╝██║     ██║     
-#*╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝ ╚═════╝  ╚═════╝     ╚═════╝ ╚═╝     ╚═╝    
-#*  
-#*
-#  █████╗ ██╗   ██╗████████╗ ██████╗     ███████╗ ██████╗██████╗ ██╗██████╗ ████████╗
-# ██╔══██╗██║   ██║╚══██╔══╝██╔═══██╗    ██╔════╝██╔════╝██╔══██╗██║██╔══██╗╚══██╔══╝
-# ███████║██║   ██║   ██║   ██║   ██║    ███████╗██║     ██████╔╝██║██████╔╝   ██║   
-# ██╔══██║██║   ██║   ██║   ██║   ██║    ╚════██║██║     ██╔══██╗██║██╔═══╝    ██║   
-# ██║  ██║╚██████╔╝   ██║   ╚██████╔╝    ███████║╚██████╗██║  ██║██║██║        ██║   
-# ╚═╝  ╚═╝ ╚═════╝    ╚═╝    ╚═════╝     ╚══════╝ ╚═════╝╚═╝  ╚═╝╚═╝╚═╝        ╚═╝   
-                                                                       
+                                                                      
 #------------------------------------------------------------------------
 #
 #
@@ -61,7 +46,16 @@ export GADLIB=/usr/local/grads
 export GASCRP=/usr/local/grads
 fi 
 
- 
+ #%
+#% maquina da UFF 
+#%
+MACH=`uname -a | cut -c7-10` 
+if [ $MACH = "DEAMA" ];then 
+export PATH=/home/cataldi/SCRIPT/grads:$PATH
+export GADDIR=/home/cataldi/SCRIPT/grads
+export GADLIB=/home/cataldi/SCRIPT/grads
+export GASCRP=/home/cataldi/SCRIPT/grads
+fi 
 
 
 #
@@ -156,7 +150,7 @@ echo "*"                                                                 >figura
 echo "* esse script é auto gerado. documentação em adquire_eta.sh"      >>figura3.gs
 echo "*By reginaldo.venturadesa@gmail.com "                             >>figura3.gs
 echo "'open modelo_all.ctl'"            >>figura3.gs
-echo "'set gxout shaded'"               >>figura3.gs
+
 #
 # pega parametros de execucao do grads
 # se é retrato ou paisagem
@@ -168,9 +162,6 @@ echo "*say page" >>figura3.gs
 #
 # se for retrato cria vpage
 #
-echo "if (page ="8.5") " >>figura3.gs
-echo "'set parea 0.5 8.5 1.5 10.2'" >>figura3.gs
-echo "endif"                                  >>figura3.gs
 echo "t0=10"                            >>figura3.gs  
 echo "tfinal=10"                        >>figura3.gs  
 echo "'set t 1 last'"                   >>figura3.gs
@@ -282,15 +273,18 @@ echo "'set lat 'y1' 'y0 "       >>figura3.gs
 #   FIGURAS RETRATO SEMANA OPERATIVA 1
 # 
 echo "if (tipo = "RETRATO" & page ="8.5" & plota="SIM") "   >>figura3.gs
+echo "'reset'"                        >>figura3.gs
+echo "'set lon 'x1' 'x0 "       >>figura3.gs
+echo "'set lat 'y1' 'y0 "       >>figura3.gs
 echo "'c'"                        >>figura3.gs
-echo "'set parea 0.5 8.5 1.5 10.2'"                                  >>figura3.gs
+echo "'set parea 0.5 8.0 1.5 10.2'"                                  >>figura3.gs
+echo "'set gxout shaded'"                        >>figura3.gs
 echo "'set t 1'"                        >>figura3.gs
 echo "'cores.gs'"                    >>figura3.gs
 echo "'d sum(prec,t=1,t='tsex')'"         >>figura3.gs
-echo "'cbarn.gs'"                       >>figura3.gs
-echo "'draw string 2.5 10.8 PRECIPITACAO ACUMULADA SEMANA OPERATIVA 1'"  >>figura3.gs
-echo "'draw string 2.5 10.6 RODADA :'dia0'/'mes0'/'ano0 "               >>figura3.gs
-echo "'draw string 2.5 10.4 PERIODO:'dia1'/'mes1'/'ano1' a 'dia2'/'mes2'/'ano2  "                     >>figura3.gs
+echo "'draw string 1.5 10.8 PRECIPITACAO ACUMULADA SEMANA OPERATIVA 1'"  >>figura3.gs
+echo "'draw string 1.5 10.6 RODADA :'dia0'/'mes0'/'ano0 "               >>figura3.gs
+echo "'draw string 1.5 10.4 PERIODO:'dia1'/'mes1'/'ano1' a 'dia2'/'mes2'/'ano2  "                     >>figura3.gs
 echo "'set rgb 50   255   255    255'" >>figura3.gs
 echo "'basemap.gs O 50 0 M'" >>figura3.gs
 echo "'set mpdset hires'" >>figura3.gs
@@ -301,21 +295,24 @@ echo "'plota.gs'"                             >>figura3.gs
 echo "else"                    >>figura3.gs
 echo "'draw shp ../../CONTORNOS/SHAPES/'shape"                                                  >>figura3.gs
 echo "endif"                    >>figura3.gs
-echo "'cbarn.gs'" >>figura3.gs
 echo "'plota_hidrografia.gs'"     >>figura3.gs  
 echo "plotausina(bacia,page)" >>figura3.gs    
+echo "'cbarn.gs 1.0 0 '" >>figura3.gs
 echo "'printim 'bacia'_semanaoperativa_1_"$data".png white'"                       >>figura3.gs
 #
 # FIGURAS RETARTO SEMANA OPERATIVA 2
 #
-echo "'c'"                                                             >>figura3.gs
-echo "'set parea 0.5 8.5 1.5 10.2'"                                  >>figura3.gs
+echo "'reset'"                        >>figura3.gs
+echo "'c'"                        >>figura3.gs
+echo "'set lon 'x1' 'x0 "       >>figura3.gs
+echo "'set lat 'y1' 'y0 "       >>figura3.gs
+echo "'set parea 0.5 8.0 1.5 10.2'"                                  >>figura3.gs
+echo "'set gxout shaded'"                        >>figura3.gs
 echo "'cores.gs'"                                                >>figura3.gs
 echo "'d sum(prec,t='tsab',t='tfinal')'"                                       >>figura3.gs
-echo "*'cbarn.gs'"                                                      >>figura3.gs
-echo "'draw string 2.5 10.8 PRECIPITACAO ACUMULADA SEMANA OPERATIVA 2 '">>figura3.gs
-echo "'draw string 2.5 10.6 RODADA :'dia0'/'mes0'/'ano0 "               >>figura3.gs
-echo "'draw string 2.5 10.4 PERIODO:'dia3'/'mes3'/'ano3' a 'dia4'/'mes4'/'ano4  "                     >>figura3.gs
+echo "'draw string 1.5 10.8 PRECIPITACAO ACUMULADA SEMANA OPERATIVA 2 '">>figura3.gs
+echo "'draw string 1.5 10.6 RODADA :'dia0'/'mes0'/'ano0 "               >>figura3.gs
+echo "'draw string 1.5 10.4 PERIODO:'dia3'/'mes3'/'ano3' a 'dia4'/'mes4'/'ano4  "                     >>figura3.gs
 echo "'set rgb 50   255   255    255'"       >>figura3.gs
 echo "'basemap.gs O 50 0 M'"                 >>figura3.gs
 echo "'set mpdset hires'"                    >>figura3.gs
@@ -326,59 +323,63 @@ echo "'plota.gs'"                             >>figura3.gs
 echo "else"                    >>figura3.gs
 echo "'draw shp ../../CONTORNOS/SHAPES/'shape"                                                  >>figura3.gs
 echo "endif"                    >>figura3.gs
-echo "'cbarn.gs'" >>figura3.gs
 echo "'plota_hidrografia.gs'"     >>figura3.gs  
 echo "plotausina(bacia,page)" >>figura3.gs    
+echo "'cbarn.gs 1.0 0 '" >>figura3.gs
 echo "'printim 'bacia'_semanaoperativa_2_"$data".png white'"                       >>figura3.gs
 #
 # FIGURA RETRATO SEMANA 7 DIAS CORRIDOS 
 #
-echo "'c'"   >>figura3.gs
-echo "'set parea 0.5 8.5 1.5 10.2'"                                  >>figura3.gs
-#echo "'set mpdset hires'"                                    >>figura3.gs
+echo "'reset'"                        >>figura3.gs
+echo "'set lon 'x1' 'x0 "       >>figura3.gs
+echo "'set lat 'y1' 'y0 "       >>figura3.gs
+echo "'c'"                        >>figura3.gs
+echo "'set parea 0.5 8.0 1.5 10.2'"                                  >>figura3.gs
+echo "'set gxout shaded'"                        >>figura3.gs
+
 echo "'cores.gs'"                                         >>figura3.gs
 echo "'set gxout shaded'"                                    >>figura3.gs
 echo "'d sum(prec,t=1,t=7)'"                                 >>figura3.gs
-echo "'draw string 2.5 10.8 PRECIPITACAO ACUMULADA 7 DIAS '"  >>figura3.gs
-echo "'draw string 2.5 10.6 RODADA :'dia0'/'mes0'/'ano0 "               >>figura3.gs
-echo "'draw string 2.5 10.4 PERIODO:'dia1'/'mes1'/'ano1' a 'dia5'/'mes5'/'ano5  "                     >>figura3.gs
+echo "'draw string 1.5 10.8 PRECIPITACAO ACUMULADA 7 DIAS '"  >>figura3.gs
+echo "'draw string 1.5 10.6 RODADA :'dia0'/'mes0'/'ano0 "               >>figura3.gs
+echo "'draw string 1.5 10.4 PERIODO:'dia1'/'mes1'/'ano1' a 'dia5'/'mes5'/'ano5  "                     >>figura3.gs
 echo "'set rgb 50   255   255    255'" >>figura3.gs
 echo "'basemap.gs O 50 0 M'" >>figura3.gs
 echo "'set mpdset hires'" >>figura3.gs
 echo "'set map 15 1 6'" >>figura3.gs
 echo "'draw map'" >>figura3.gs
-echo "'cbarn.gs'"                                            >>figura3.gs
 echo "if (bacia="brasil")"                    >>figura3.gs
 echo "'plota.gs'"                             >>figura3.gs
 echo "else"                    >>figura3.gs
 echo "'draw shp ../../CONTORNOS/SHAPES/'shape"                                                  >>figura3.gs
 echo "endif"                    >>figura3.gs
-echo "'cbarn.gs'" >>figura3.gs
 echo "'plota_hidrografia.gs'"     >>figura3.gs
 echo "plotausina(bacia,page)" >>figura3.gs  
+echo "'cbarn.gs 1.0 0 '" >>figura3.gs
 echo "'printim 'bacia'_prec07dias_"$data"_"$hora"Z.png white'"       >>figura3.gs
 echo "*say t0"                           >>figura3.gs
 #
 #
 #
-echo "'c'" >>figura3.gs 
 echo "t=1 "    >>figura3.gs 
 echo "while (t<=10) "    >>figura3.gs 
+echo "'reset'"                        >>figura3.gs
 echo "'set t 't"                     >>figura3.gs   
 echo "'q time'"                           >>figura3.gs 
 echo "var1=subwrd(result,3)"            >>figura3.gs
 echo "ano1=substr(var1,9,4)"                       >>figura3.gs
 echo "mes1=substr(var1,6,3)"                       >>figura3.gs
 echo "dia1=substr(var1,4,2)"                       >>figura3.gs
+echo "'set lon 'x1' 'x0 "       >>figura3.gs
+echo "'set lat 'y1' 'y0 "       >>figura3.gs
 echo "'c'"                        >>figura3.gs
-echo "'c'"                        >>figura3.gs
-echo "'set parea 0.5 10.5 1.88392 7.31608'"                     >>figura3.gs
+echo "'set parea 0.5 8.0 1.5 10.2'"                                  >>figura3.gs
+echo "'set gxout shaded'"                        >>figura3.gs
 echo "'coresdiaria.gs'"                    >>figura3.gs
 echo "'d prec'"         >>figura3.gs
-echo "'cbarn.gs'"                       >>figura3.gs
-echo "'draw string 2.5 10.8 PRECIPITACAO DIARIA ETA 40KM '"  >>figura3.gs
-echo "'draw string 2.5 10.6 RODADA :'dia0'/'mes0'/'ano0 "               >>figura3.gs
-echo "'draw string 2.5 10.4 PERIODO:'dia1'/'mes1'/'ano1   "                     >>figura3.gs
+echo "'draw string 1.5 10.8 PRECIPITACAO DIARIA ETA 40KM '"  >>figura3.gs
+echo "'draw string 1.5 10.6 RODADA :'dia0'/'mes0'/'ano0 "               >>figura3.gs
+echo "'draw string 1.5 10.4 PERIODO:'dia1'/'mes1'/'ano1   "                     >>figura3.gs
 echo "'set rgb 50   255   255    255'" >>figura3.gs
 echo "'basemap.gs O 50 0 M'" >>figura3.gs
 echo "'set mpdset hires'" >>figura3.gs
@@ -388,6 +389,7 @@ echo "'draw shp ../../CONTORNOS/SHAPES/'shape"                                  
 echo "say shape" >>figura3.gs
 echo "'plota_hidrografia.gs'"     >>figura3.gs
 echo "plotausina(bacia,page)" >>figura3.gs  
+echo "'cbarn.gs 1.0 0 '" >>figura3.gs
 echo "'printim 'bacia'_diaria_'var1'.png white'"                       >>figura3.gs
 echo "'c'"                                                             >>figura3.gs
 echo "t=t+1"                    >>figura3.gs
@@ -409,17 +411,18 @@ echo "endif"                            >>figura3.gs
 #  FIGURA PAISAGEM  SEMANA OPERATIVA 1
 #
 echo "if (tipo = "PAISAGEM" & page ="11" & plota="SIM" ) "   >>figura3.gs
+echo "'reset'"                        >>figura3.gs
+echo "'set lon 'x1' 'x0 "       >>figura3.gs
+echo "'set lat 'y1' 'y0 "       >>figura3.gs
 echo "'c'"                        >>figura3.gs
-echo "'set parea 0.5 10.5 1.88392 7.31608'"                     >>figura3.gs
+echo "'set parea 0.5 10.5 1.5 7.6'"                     >>figura3.gs
+echo "'set gxout shaded'"                        >>figura3.gs
 echo "'set t 1'"                        >>figura3.gs
 echo "'cores.gs'"                    >>figura3.gs
 echo "'d sum(prec,t=1,t='tsex')'"         >>figura3.gs
-echo "'cbarn.gs'"                       >>figura3.gs
-echo "'draw string 2.5 8.3 PRECIPITACAO ACUMULADA SEMANA OPERATIVA 1'"  >>figura3.gs
-#echo "'draw string 2.5 8.1 RODADA:"$DATA0" - "$hora"Z'"                >>figura3.gs
-#echo "'draw string 2.5 7.9 PERIODO:'dia1'/'mes1'/'ano1' a 'dia2'/'mes2'/'ano2  "                     >>figura3.gs
-echo "'draw string 2.5 8.1 RODADA :'dia0'/'mes0'/'ano0 "               >>figura3.gs
-echo "'draw string 2.5 7.9 PERIODO:'dia1'/'mes1'/'ano1' a 'dia2'/'mes2'/'ano2  "                     >>figura3.gs
+echo "'draw string 1.5 8.3 PRECIPITACAO ACUMULADA SEMANA OPERATIVA 1'"  >>figura3.gs
+echo "'draw string 1.5 8.1 RODADA :'dia0'/'mes0'/'ano0 "               >>figura3.gs
+echo "'draw string 1.5 7.9 PERIODO:'dia1'/'mes1'/'ano1' a 'dia2'/'mes2'/'ano2  "                     >>figura3.gs
 echo "'set rgb 50   255   255    255'" >>figura3.gs
 echo "'basemap.gs O 50 0 M'" >>figura3.gs
 echo "'set mpdset hires'" >>figura3.gs
@@ -429,51 +432,60 @@ echo "'draw shp ../../CONTORNOS/SHAPES/'shape"                                  
 echo "say shape" >>figura3.gs
 echo "'plota_hidrografia.gs'"     >>figura3.gs
 echo "plotausina(bacia,page)" >>figura3.gs  
+echo "'cbarn.gs 1.0 0 '"               >>figura3.gs
 echo "'printim 'bacia'_semanaoperativa_1_"$data".png white'"                       >>figura3.gs
+
 #
 # FIGURA PAISAGEM SEMANA OPERATIVA 2
 #
+echo "'reset'"                        >>figura3.gs
+echo "'set lon 'x1' 'x0 "       >>figura3.gs
+echo "'set lat 'y1' 'y0 "       >>figura3.gs
 echo "'c'"                                                             >>figura3.gs
-echo "'set parea 0.5 10.5 1.88392 7.31608'"                     >>figura3.gs
+echo "'set parea 0.5 10.5 1.5 7.6'"                     >>figura3.gs
+echo "'set gxout shaded'"                        >>figura3.gs
 echo "'cores.gs'"                                                >>figura3.gs
 echo "'d sum(prec,t='tsab',t='tfinal')'"                                       >>figura3.gs
-echo "'cbarn.gs'"                                                      >>figura3.gs
-echo "'draw string 2.5 8.3 PRECIPITACAO ACUMULADA SEMANA OPERATIVA 2 '">>figura3.gs
-echo "'draw string 2.5 8.1 RODADA :'dia0'/'mes0'/'ano0"               >>figura3.gs
-echo "'draw string 2.5 7.9 PERIODO:'dia3'/'mes3'/'ano3' a 'dia4'/'mes4'/'ano4  "      >>figura3.gs
+echo "'draw string 1.5 8.3 PRECIPITACAO ACUMULADA SEMANA OPERATIVA 2 '">>figura3.gs
+echo "'draw string 1.5 8.1 RODADA :'dia0'/'mes0'/'ano0"               >>figura3.gs
+echo "'draw string 1.5 7.9 PERIODO:'dia3'/'mes3'/'ano3' a 'dia4'/'mes4'/'ano4  "      >>figura3.gs
 echo "'set rgb 50   255   255    255'" >>figura3.gs
 echo "'basemap.gs O 50 0 M'" >>figura3.gs
 echo "'set mpdset hires'" >>figura3.gs
 echo "'set map 15 1 6'" >>figura3.gs
 echo "'draw map'" >>figura3.gs     
 echo "'draw shp ../../CONTORNOS/SHAPES/'shape"                                                        >>figura3.gs
-echo "'cbarn.gs'" >>figura3.gs
 echo "'plota_hidrografia.gs'"     >>figura3.gs
 echo "plotausina(bacia,page)" >>figura3.gs  
-
+echo "'cbarn.gs 1.0 0 '" >>figura3.gs
 echo "'printim 'bacia'_semanaoperativa_2_"$data".png white'"                       >>figura3.gs
 #
 # FIGURA PAISAGEM SEMANA 7 dias
 #
 echo "'c'"   >>figura3.gs
-echo "*'set parea 0.5 10.5 1.88392 7.31608'"                     >>figura3.gs
-#echo "'set parea off'"                                    >>figura3.gs
+echo "'reset'"                        >>figura3.gs
+echo "'set lon 'x1' 'x0 "       >>figura3.gs
+echo "'set lat 'y1' 'y0 "       >>figura3.gs
+echo "'set parea 0.5 10.5 1.5 7.6'"                     >>figura3.gs
+echo "'set gxout shaded'"                        >>figura3.gs
 echo "'set mpdset hires'"                                    >>figura3.gs
 echo "'cores.gs'"                                         >>figura3.gs
+echo "'set lon 'x1' 'x0 "       >>figura3.gs
+echo "'set lat 'y1' 'y0 "       >>figura3.gs
 echo "'set gxout shaded'"                                    >>figura3.gs
 echo "'d sum(prec,t=1,t=7)'"                                 >>figura3.gs
-echo "'draw string 2.5 8.3 PRECIPITACAO ACUMULADA 7 DIAS '"  >>figura3.gs
-echo "'draw string 2.5 8.1 RODADA :'dia0'/'mes0'/'ano0"               >>figura3.gs
-echo "'draw string 2.5 7.9 PERIODO:'dia1'/'mes1'/'ano1' a 'dia5'/'mes5'/'ano5  "                     >>figura3.gs
+echo "'draw string 1.5 8.3 PRECIPITACAO ACUMULADA 7 DIAS '"  >>figura3.gs
+echo "'draw string 1.5 8.1 RODADA :'dia0'/'mes0'/'ano0"               >>figura3.gs
+echo "'draw string 1.5 7.9 PERIODO:'dia1'/'mes1'/'ano1' a 'dia5'/'mes5'/'ano5  "                     >>figura3.gs
 echo "'set rgb 50   255   255    255'" >>figura3.gs
 echo "'basemap.gs O 50 0 M'" >>figura3.gs
 echo "'set mpdset hires'" >>figura3.gs
 echo "'set map 15 1 6'" >>figura3.gs
 echo "'draw map'" >>figura3.gs     
-echo "'cbarn.gs'"                                            >>figura3.gs
 echo "'draw shp ../../CONTORNOS/SHAPES/'shape"     >>figura3.gs
 echo "'plota_hidrografia.gs'"     >>figura3.gs
 echo "plotausina(bacia,page)" >>figura3.gs 
+echo "'cbarn.gs 1.0 0 '" >>figura3.gs
 echo "'printim 'bacia'_prec07dias_"$data"_"$hora"Z.png white'"       >>figura3.gs
 
 #
@@ -491,14 +503,17 @@ echo "mes1=substr(var1,6,3)"                       >>figura3.gs
 echo "dia1=substr(var1,4,2)"                       >>figura3.gs
 echo "'c'"                        >>figura3.gs
 echo "'c'"                        >>figura3.gs
-echo "'set parea 0.5 10.5 1.88392 7.31608'"                     >>figura3.gs
+echo "'reset'"                        >>figura3.gs
+echo "'set parea 0.5 10.5 1.5 7.6'"                     >>figura3.gs
+echo "'set lon 'x1' 'x0 "       >>figura3.gs
+echo "'set lat 'y1' 'y0 "       >>figura3.gs
+echo "'set gxout shaded'"                        >>figura3.gs
+echo "'set t 't"                     >>figura3.gs  
 echo "'coresdiaria.gs'"                    >>figura3.gs
 echo "'d prec'"         >>figura3.gs
-echo "'cbarn.gs'"                       >>figura3.gs
-echo "'draw string 2.5 8.3 PRECIPITACAO DIARIA ETA 40KM'"  >>figura3.gs
-echo "'draw string 2.5 8.1 RODADA :'dia0'/'mes0'/'ano0"               >>figura3.gs
-#echo "'draw string 2.5 8.1 RODADA :"$data_rodada"'"               >>figura3.gs
-echo "'draw string 2.5 7.9 DIA    :'dia1'/'mes1'/'ano1  "                     >>figura3.gs
+echo "'draw string 1.5 8.3 PRECIPITACAO DIARIA ETA 40KM'"  >>figura3.gs
+echo "'draw string 1.5 8.1 RODADA :'dia0'/'mes0'/'ano0"               >>figura3.gs
+echo "'draw string 1.5 7.9 DIA    :'dia1'/'mes1'/'ano1  "                     >>figura3.gs
 echo "'set rgb 50   255   255    255'" >>figura3.gs
 echo "'basemap.gs O 50 0 M'" >>figura3.gs
 echo "'set mpdset hires'" >>figura3.gs
@@ -507,7 +522,8 @@ echo "'draw map'" >>figura3.gs
 echo "'draw shp ../../CONTORNOS/SHAPES/'shape"                                                  >>figura3.gs
 echo "say shape" >>figura3.gs
 echo "'plota_hidrografia.gs'"     >>figura3.gs
-echo "plotausina(bacia,page)" >>figura3.gs  
+echo "plotausina(bacia,page)" >>figura3.gs
+echo "'cbarn.gs 1.0 0 '" >>figura3.gs  
 echo "'printim 'bacia'_diaria_'var1'.png white'"                       >>figura3.gs
 echo "'c'"                                                             >>figura3.gs
 echo "t=t+1"                    >>figura3.gs
@@ -532,15 +548,14 @@ echo "'quit'"                          								>>figura3.gs
 #
 #  cria parte comum como tabelas de cores e escalas, hidrografoa etc...
 #
-../../common_stuff.sh  
-
+../../common_stuff.sh
+cp ../../opoly_mres.asc .
 
 #
 # ESSE ARQUIVO CONTEM AS LOCALIZACOES DAS USNINAS
 # A SEREM PLOTADOS NAS FIGURAS xxxxxxx
 #
 cat  ../../UTIL/modulo_grads.mod  >> figura3.gs
-echo "["`date`"] CALCULANDO MEDIA POR BACIA" 
 #
 # Geracao de produtos
 #
@@ -551,7 +566,7 @@ echo "["`date`"] PLOTANDO FIGURAS SEMANA OPERATIVA FORMATO RETRATO POR BACIAS"
 grads -pbc "figura3.gs"  >>./LOG.prn 2>&1
 echo "["`date`"] PLOTANDO FIGURAS SEMANA OPERATIVA FORMATO PAISAGEM POR BACIAS" 
 grads -lbc "figura3.gs"  >>./LOG.prn 2>&1
-echo "["`date`"] AJUSTANDO CRIAÇÕES " 
+echo "["`date`"] FINALIZANDO" 
 mkdir imagens_semanaoperativa_1  >>./LOG.prn 2>&1
 mkdir imagens_semanaoperativa_2 >>./LOG.prn 2>&1
 mkdir imagens_7dias   >>./LOG.prn 2>&1
