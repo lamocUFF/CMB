@@ -28,10 +28,7 @@
 export LANG=en_us_8859_1
 
 
-export PATH=$PATH:/usr/local/grads
-export GADDIR=/usr/local/grads
-export GADLIB=/usr/local/grads
-export GASCRP=/usr/local/grads
+
 
 
 MACH=`uname -a | cut -c1-5` 
