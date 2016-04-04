@@ -58,6 +58,9 @@ export GASCRP=/home/cataldi/SCRIPT/grads
 fi 
 
 
+export FIGURA=1
+
+
 #
 # Pega data do dia (relogio do micro)
 # 
@@ -299,6 +302,8 @@ echo "'plota_hidrografia.gs'"     >>figura3.gs
 echo "plotausina(bacia,page)" >>figura3.gs    
 echo "'cbarn.gs 1.0 0 '" >>figura3.gs
 echo "'printim 'bacia'_semanaoperativa_1_"$data".png white'"                       >>figura3.gs
+echo "jj=write('lista_de_figuras.dat',bacia'_semanaoperativa_1_$data.png') " >>figura3.gs
+
 #
 # FIGURAS RETARTO SEMANA OPERATIVA 2
 #
@@ -327,7 +332,7 @@ echo "'plota_hidrografia.gs'"     >>figura3.gs
 echo "plotausina(bacia,page)" >>figura3.gs    
 echo "'cbarn.gs 1.0 0 '" >>figura3.gs
 echo "'printim 'bacia'_semanaoperativa_2_"$data".png white'"                       >>figura3.gs
-#
+echo "jj=write('lista_de_figuras.dat',bacia'_semanaoperativa_2_$data.png') " >>figura3.gs
 # FIGURA RETRATO SEMANA 7 DIAS CORRIDOS 
 #
 echo "'reset'"                        >>figura3.gs
@@ -357,6 +362,7 @@ echo "'plota_hidrografia.gs'"     >>figura3.gs
 echo "plotausina(bacia,page)" >>figura3.gs  
 echo "'cbarn.gs 1.0 0 '" >>figura3.gs
 echo "'printim 'bacia'_prec07dias_"$data"_"$hora"Z.png white'"       >>figura3.gs
+echo "jj=write('lista_de_figuras.dat',bacia'_prec07dias_'"$data"_"$hora"'Z.png') " >>figura3.gs
 echo "*say t0"                           >>figura3.gs
 #
 #
@@ -391,6 +397,8 @@ echo "'plota_hidrografia.gs'"     >>figura3.gs
 echo "plotausina(bacia,page)" >>figura3.gs  
 echo "'cbarn.gs 1.0 0 '" >>figura3.gs
 echo "'printim 'bacia'_diaria_'var1'.png white'"                       >>figura3.gs
+echo "jj=write('lista_de_figuras.dat',bacia'_diaria_'var1'.png') " >>figura3.gs
+
 echo "'c'"                                                             >>figura3.gs
 echo "t=t+1"                    >>figura3.gs
 echo "'c'"                    >>figura3.gs
@@ -434,7 +442,7 @@ echo "'plota_hidrografia.gs'"     >>figura3.gs
 echo "plotausina(bacia,page)" >>figura3.gs  
 echo "'cbarn.gs 1.0 0 '"               >>figura3.gs
 echo "'printim 'bacia'_semanaoperativa_1_"$data".png white'"                       >>figura3.gs
-
+echo "jj=write('lista_de_figuras.dat',bacia'_semanaoperativa_1_$data.png') " >>figura3.gs
 #
 # FIGURA PAISAGEM SEMANA OPERATIVA 2
 #
@@ -459,6 +467,8 @@ echo "'plota_hidrografia.gs'"     >>figura3.gs
 echo "plotausina(bacia,page)" >>figura3.gs  
 echo "'cbarn.gs 1.0 0 '" >>figura3.gs
 echo "'printim 'bacia'_semanaoperativa_2_"$data".png white'"                       >>figura3.gs
+echo "jj=write('lista_de_figuras.dat',bacia'_semanaoperativa_2_$data.png') " >>figura3.gs
+
 #
 # FIGURA PAISAGEM SEMANA 7 dias
 #
@@ -487,6 +497,7 @@ echo "'plota_hidrografia.gs'"     >>figura3.gs
 echo "plotausina(bacia,page)" >>figura3.gs 
 echo "'cbarn.gs 1.0 0 '" >>figura3.gs
 echo "'printim 'bacia'_prec07dias_"$data"_"$hora"Z.png white'"       >>figura3.gs
+echo "jj=write('lista_de_figuras.dat',bacia'_prec07dias_'"$data"_"$hora"'Z.png') " >>figura3.gs
 
 #
 #
@@ -525,6 +536,7 @@ echo "'plota_hidrografia.gs'"     >>figura3.gs
 echo "plotausina(bacia,page)" >>figura3.gs
 echo "'cbarn.gs 1.0 0 '" >>figura3.gs  
 echo "'printim 'bacia'_diaria_'var1'.png white'"                       >>figura3.gs
+echo "jj=write('lista_de_figuras.dat',bacia'_diaria_'var1'.png') " >>figura3.gs
 echo "'c'"                                                             >>figura3.gs
 echo "t=t+1"                    >>figura3.gs
 echo "'c'"                    >>figura3.gs
@@ -545,6 +557,8 @@ echo "endif"                            							>>figura3.gs
 echo "endwhile"                          							>>figura3.gs
 echo "'quit'"                          								>>figura3.gs
 
+
+
 #
 #  cria parte comum como tabelas de cores e escalas, hidrografoa etc...
 #
@@ -562,6 +576,8 @@ cat  ../../UTIL/modulo_grads.mod  >> figura3.gs
 cp ../../calcula_versao3.gs .
 echo "["`date`"] CALCULANDO MÉDIA POR BACIA " 
 grads -lbc "calcula_versao3.gs" >>./LOG.prn 2>&1
+
+if [ FIGURA=1 ];then  
 echo "["`date`"] PLOTANDO FIGURAS SEMANA OPERATIVA FORMATO RETRATO POR BACIAS" 
 grads -pbc "figura3.gs"  >>./LOG.prn 2>&1
 echo "["`date`"] PLOTANDO FIGURAS SEMANA OPERATIVA FORMATO PAISAGEM POR BACIAS" 
@@ -575,6 +591,10 @@ mv *semanaoperativa_1*  imagens_semanaoperativa_1  >>./LOG.prn 2>&1
 mv *semanaoperativa_2*  imagens_semanaoperativa_2  >>./LOG.prn 2>&1
 mv *prec07dias* imagens_7dias                      >>./LOG.prn 2>&1
 mv *.png diaria  >>./LOG.prn 2>&1
+
+fi 
+
+
 cd ..
 cd ..
 pwd
