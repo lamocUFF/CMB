@@ -66,6 +66,7 @@ var=sublin(id,2)
 opcao=subwrd(var,1)
 bacia=subwrd(var,2)
 label=subwrd(var,3)
+temremov=subwrd(var,12)
 *
 * SE EM LIMITES-DAS-BACIAS.DAT
 * EH MARCADO COMO NAO , NÃO FAZ
@@ -141,7 +142,9 @@ t=t+1
 endwhile
 say "=================================="label' 'data1' 'bacia
 if (opcao ="SIM") 
+if (temremov="SIM")
 ih=removiessum(label,data1,bacia) 
+endif
 endif 
 ************  da linha 36
 endwhile     
@@ -237,6 +240,7 @@ rc3 = math_format("%5.2f",chuva)
 yyy=write(arquivo,data1' 'dataprev' 'rc3)
 pp=pp+1
 endwhile
+return
 endif 
 *=========================================================================================================================================
 *
@@ -288,6 +292,7 @@ rc3 = math_format("%5.2f",chuva)
 yyy=write(arquivo,data1' 'dataprev' 'rc3)
 pp=pp+1
 endwhile
+return
 endif 
 *=========================================================================================================================================
 *
@@ -338,6 +343,7 @@ rc3 = math_format("%5.2f",chuva)
 yyy=write(arquivo,data1' 'dataprev' 'rc3)
 pp=pp+1
 endwhile
+return
 endif 
 *=========================================================================================================================================
 *
@@ -380,6 +386,7 @@ rc3 = math_format("%5.2f",chuva)
 yyy=write(arquivo,data1' 'dataprev' 'rc3)
 pp=pp+1
 endwhile
+return
 endif 
 *=========================================================================================================================================
 *
@@ -430,6 +437,7 @@ rc3 = math_format("%5.2f",chuva)
 yyy=write(arquivo,data1' 'dataprev' 'rc3)
 pp=pp+1
 endwhile
+return
 endif 
 
 
@@ -483,6 +491,7 @@ rc3 = math_format("%5.2f",chuva)
 yyy=write(arquivo,data1' 'dataprev' 'rc3)
 pp=pp+1
 endwhile
+return
 endif 
 *=========================================================================================================================================
 *
@@ -534,6 +543,7 @@ rc3 = math_format("%5.2f",chuva)
 yyy=write(arquivo,data1' 'dataprev' 'rc3)
 pp=pp+1
 endwhile
+return
 endif 
 *=========================================================================================================================================
 *
@@ -585,6 +595,7 @@ rc3 = math_format("%5.2f",chuva)
 yyy=write(arquivo,data1' 'dataprev' 'rc3)
 pp=pp+1
 endwhile
+return
 endif 
 
 
@@ -638,6 +649,7 @@ rc3 = math_format("%5.2f",chuva)
 yyy=write(arquivo,data1' 'dataprev' 'rc3)
 pp=pp+1
 endwhile
+return
 endif
 
 
@@ -691,6 +703,7 @@ rc3 = math_format("%5.2f",chuva)
 yyy=write(arquivo,data1' 'dataprev' 'rc3)
 pp=pp+1
 endwhile
+return
 endif
 
 *=========================================================================================================================================
@@ -743,6 +756,7 @@ rc3 = math_format("%5.2f",chuva)
 yyy=write(arquivo,data1' 'dataprev' 'rc3)
 pp=pp+1
 endwhile
+return
 endif 
 
 
@@ -795,6 +809,7 @@ rc3 = math_format("%5.2f",chuva)
 yyy=write(arquivo,data1' 'dataprev' 'rc3)
 pp=pp+1
 endwhile
+return
 endif
 
 *=========================================================================================================================================
@@ -846,6 +861,7 @@ rc3 = math_format("%5.2f",chuva)
 yyy=write(arquivo,data1' 'dataprev' 'rc3)
 pp=pp+1
 endwhile
+return
 endif
 
 *=========================================================================================================================================
@@ -898,7 +914,35 @@ rc3 = math_format("%5.2f",chuva)
 yyy=write(arquivo,data1' 'dataprev' 'rc3)
 pp=pp+1
 endwhile
+return 
 endif 
+
+
+
+*---------------------------------------------------------------
+* CALCULA 
+*
+
+pp=1
+while (pp<=10)
+'set t ' pp
+'q time'
+dataprev=subwrd(result,3)
+*
+* calcula da chuva com remocao
+*
+ppre.pp=_pchuva.pp
+
+*
+* limite diario
+*
+chuva=ppre.pp
+rc3 = math_format("%5.2f",chuva)
+yyy=write(arquivo,data1' 'dataprev' 'rc3)
+pp=pp+1
+endwhile
+return
+
 
 return ptoteta10
 
